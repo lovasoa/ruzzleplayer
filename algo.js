@@ -1,4 +1,4 @@
-var dict = ["bu", "va", "bave", "papa", "casse", "bout"];
+importScripts("dict.js")
 
 function Player (size) {
   this.grid = {};
@@ -77,7 +77,7 @@ Player.prototype.position_is_adjacent = function(pos1, pos2){
 }
 
 
-p = new Player([5,5]);
+p = new Player([4,4]);
 self.onmessage = function(event) {
   p.add_letter(event.data);
 };

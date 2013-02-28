@@ -1,25 +1,69 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="utf-8">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <title>Ruzzle solver</title>
-<script>
-var worker = new Worker('algo.js');
-
-worker.onmessage = function(event) {
-  document.getElementById("solutions").innerHtml += "<br>"+event.data;
-};
-
-function newLetter (evt) {
-  worker.postMessage(evt.)
+<style>
+#grid {
+    background-color : #987;
+    width: 400px;
+    height: 400px;
 }
 
+#grid span {
+    display:inline-block;
+    background-color: #FED;
+    width: 90px;
+    height: 90px;
+    margin: 3px;
+    text-align: center;
+    font-size: 60px;
+    border-radius:5px;
+    border: 1px solid #111;
+}
+
+#solutions {
+    width:50%;
+    float:right;
+    font-size:1.2em;
+}
+
+#solutions p {
+    display:inline-block;
+    margin: 10px;
+}
+</style>
+<script>
+$(function (){
+var worker = new Worker('algo.js');
+var grid_is_full = false;
+
+worker.onmessage = function(event) {
+    var word = event.data;
+    grid_is_full = true;
+    console.log(event.data);
+    $("<p>").text(word).appendTo("#solutions");
+};
+
+$(document).keypress(function (evt) {
+    if (grid_is_full) return false;
+    var letter = String.fromCharCode(evt.charCode);
+    worker.postMessage(letter);
+    $("<span>").text(letter).appendTo("#grid");
+});
+});
 </script>
 </head>
 
 <body>
 <h1>Ruzzle solver</h1>
+
+<div id="solutions">
+</div>
+
 <div id="grid"></div>
 
-<div id="solutions"></div>
+
 </body>
 </html>
