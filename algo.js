@@ -21,13 +21,14 @@ Player.prototype.letter_added = function () {
 }
 
 Player.prototype.add_letter = function (letter) {
-  if (this.grid[letter] === undefined){
-    this.grid[letter] = {
+  var square = {
       pos : this.curPos.slice(0),  //.slice(0) clones the array
       clean : true
-    };
+  };
+  if (this.grid[letter] === undefined){
+    this.grid[letter] = [square];
   } else {
-    this.grid[letter].push(this.curPos);
+    this.grid[letter].push(square);
   }
   
   this.letter_added();
