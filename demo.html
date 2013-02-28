@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Ruzzle solver</title>
+<script>
+var worker = new Worker('algo.js');
+
+worker.onmessage = function(event) {
+  document.getElementById("solutions").innerHtml += "<br>"+event.data;
+};
+
+function newLetter (evt) {
+  worker.postMessage(evt.)
+}
+
+</script>
+</head>
+
+<body>
+<h1>Ruzzle solver</h1>
+<div id="grid"></div>
+
+<div id="solutions"></div>
+</body>
+</html>
