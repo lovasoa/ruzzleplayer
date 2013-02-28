@@ -39,7 +39,7 @@ Player.prototype.search_words = function() {
   }
 }
 
-Player.prototype.word_is_present_recur = function(word, letter, curPos){
+Player.prototype.word_is_present = function(word, letter, curPos){
   //Return true if the dict[word] is present on the grid
   //This function assumes that dict[word].slice(0,letter) is present
   //curPos indicates where we currently are on the grid
