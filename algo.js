@@ -36,7 +36,9 @@ Player.prototype.add_letter = function (letter) {
 
 Player.prototype.search_words = function() {
   for (var i=0; i<dict.length; i++){
-    if(this.word_is_present(i, 0, [])) alert(dict[i]);
+    if(this.word_is_present(i, 0, [])){
+      self.postMessage(dict[i]);
+    }
   }
 }
 
@@ -73,3 +75,9 @@ Player.prototype.position_is_adjacent = function(pos1, pos2){
   if (dist===1 || dist===2) return true;
   return false;
 }
+
+
+p = new Player([5,5]);
+self.onmessage = function(event) {
+  p.add_letter(event.data);
+};
