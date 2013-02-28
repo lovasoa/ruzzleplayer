@@ -15,7 +15,7 @@ Player.prototype.letter_added = function () {
     this.curPos[1] ++;
     if (this.curPos[1] === this.size[1]) {
       //The grid is full, start testing words
-      this.start_search();
+      this.search_words();
     }
   }
 }
@@ -33,17 +33,16 @@ Player.prototype.add_letter = function (letter) {
   this.letter_added();
 }
 
-Player.prototype.start_search = function() {
+Player.prototype.search_words = function() {
   for (var i=0; i<dict.length; i++){
     if(this.word_is_present(i, 0, [])) alert(dict[i]);
   }
 }
 
-Player.prototype.word_is_present = function(word, letter, curSquare){
+Player.prototype.word_is_present_recur = function(word, letter, curPos){
   //Return true if the dict[word] is present on the grid
   //This function assumes that dict[word].slice(0,letter) is present
   //curPos indicates where we currently are on the grid
-  
   if (letter === dict[word].length) return true;
 
   var letters = this.grid[dict[word][letter]];
@@ -52,13 +51,18 @@ Player.prototype.word_is_present = function(word, letter, curSquare){
   if (letters === undefined) return false;
 
   for (var i=0; i<letters.length; i++){
+
     if (letters[i].clean &&
-       this.position_is_adjacent(curSquare.pos, letters[i].pos) &&
-       this.word_is_present(word, letter+1, letters[i].pos)){
-        return true;
-    }
+       this.position_is_adjacent(curPos, letters[i].pos) ) {
+
+         letters[i].clean = false;
+         var is_present = this.word_is_present(word, letter+1, letters[i].pos);
+         letters[i].clean = true;
+         
+         if (is_present) return true;
+       }
   }
-  
+  return false;
 }
 
 Player.prototype.position_is_adjacent = function(pos1, pos2){
