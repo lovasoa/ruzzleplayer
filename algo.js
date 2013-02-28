@@ -1,4 +1,4 @@
-var dict = ["bu", "va", "bave"];
+var dict = ["bu", "va", "bave", "papa", "casse", "bout"];
 
 function Player (size) {
   this.grid = {};
