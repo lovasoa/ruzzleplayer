@@ -1,4 +1,4 @@
-importScripts("dict.js")
+importScripts("dict.js");
 
 function Player (size) {
   this.grid = {};
