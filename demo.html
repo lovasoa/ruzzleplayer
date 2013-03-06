@@ -9,6 +9,7 @@
     background-color : #987;
     width: 400px;
     height: 400px;
+    padding:3px;
 }
 
 #grid span {
@@ -37,28 +38,72 @@
 <script>
 $(function (){
 var worker = new Worker('algo.js');
-var grid_is_full = false;
+
+var can_type = false;
 
 worker.onmessage = function(event) {
-    var word = event.data;
-    grid_is_full = true;
-    console.log(event.data);
-    $("<p>").text(word).appendTo("#solutions");
+    var msg = event.data;
+    
+    switch (msg.type) {
+        case "word":
+            $("<p>").text(msg.word).appendTo("#solutions");
+            break;
+        case "ready":
+            worker.postMessage({type:'init', size:[4,4]})
+            can_type = true;
+            $("#message").hide();
+            break;
+        case "loading":
+            $("#message").text(msg.text);
+            break;
+        case "start":
+            can_type = false;
+        case "end":
+            $("#message").text("Dictionary scanned in "+msg.time+"ms.").show();
+            break;
+    }
+
 };
 
 $(document).keypress(function (evt) {
-    if (grid_is_full) return false;
-    var letter = String.fromCharCode(evt.charCode);
-    worker.postMessage(letter);
-    $("<span>").text(letter).appendTo("#grid");
+    if (evt.charCode===13) {
+        worker.postMessage({type:'init', size:[4,4]});
+        can_type = true;
+        $("#grid").html("");
+        $("#solutions").html("");
+        $("#message").text("New grid!")
+        return;
+    }
+    if (can_type) {
+        var letter = removeAccents(String.fromCharCode(evt.charCode));
+        worker.postMessage({type:'add_letter',letter:letter});
+        $("<span>").text(letter).appendTo("#grid");
+    }
 });
 });
+
+
+function removeAccents (s){
+            var r=s.toLowerCase();
+            r = r.replace(new RegExp(/[àáâãäå]/g),"a");
+            r = r.replace(new RegExp(/æ/g),"ae");
+            r = r.replace(new RegExp(/ç/g),"c");
+            r = r.replace(new RegExp(/[èéêë]/g),"e");
+            r = r.replace(new RegExp(/[ìíîï]/g),"i");
+            r = r.replace(new RegExp(/ñ/g),"n");                
+            r = r.replace(new RegExp(/[òóôõö]/g),"o");
+            r = r.replace(new RegExp(/œ/g),"oe");
+            r = r.replace(new RegExp(/[ùúûü]/g),"u");
+            r = r.replace(new RegExp(/[ýÿ]/g),"y");
+            return r;
+};
 </script>
 </head>
 
 <body>
 <h1>Ruzzle solver</h1>
 
+<div id="message">Chargement du code...</div>
 <div id="solutions">
 </div>
 

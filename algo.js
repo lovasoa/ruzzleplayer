@@ -1,4 +1,6 @@
-importScripts("dict.js");
+self.postMessage({type:"loading", text:"Loading the dictionary..."});
+importScripts("longDict.js");
+self.postMessage({type:"loading", text:"Loading the algorithm..."});
 
 function Player (size) {
   this.grid = {};
@@ -15,7 +17,10 @@ Player.prototype.letter_added = function () {
     this.curPos[1] ++;
     if (this.curPos[1] === this.size[1]) {
       //The grid is full, start testing words
-      this.search_words();
+      var t = new Date().getTime();
+      self.postMessage({type:"start"});
+      this.search_words_JSON(dict, "");
+      self.postMessage({type:"end",time:(new Date().getTime() - t)});
     }
   }
 }
@@ -34,21 +39,22 @@ Player.prototype.add_letter = function (letter) {
   this.letter_added();
 }
 
-Player.prototype.search_words = function() {
-  for (var i=0; i<dict.length; i++){
-    if(this.word_is_present(i, 0, [])){
-      self.postMessage(dict[i]);
+Player.prototype.search_words_JSON = function(curDict, curWord) {
+    if(this.word_is_present_JSON(curWord, 0, [])){
+        for (var i in curDict){
+            if (curDict[i]===1) self.postMessage({type:"word",word:curWord});
+            else this.search_words_JSON(curDict[i], curWord+i);
+        }
     }
-  }
 }
 
-Player.prototype.word_is_present = function(word, letter, curPos){
+Player.prototype.word_is_present_JSON = function(word, letter, curPos){
   //Return true if the dict[word] is present on the grid
   //This function assumes that dict[word].slice(0,letter) is present
   //curPos indicates where we currently are on the grid
-  if (letter === dict[word].length) return true;
+  if (letter === word.length) return true;
 
-  var letters = this.grid[dict[word][letter]];
+  var letters = this.grid[word[letter]];
 
   //The next letter in the word is not on the grid
   if (letters === undefined) return false;
@@ -59,9 +65,9 @@ Player.prototype.word_is_present = function(word, letter, curPos){
        this.position_is_adjacent(curPos, letters[i].pos) ) {
 
          letters[i].clean = false;
-         var is_present = this.word_is_present(word, letter+1, letters[i].pos);
+         var is_present = this.word_is_present_JSON(word, letter+1, letters[i].pos);
          letters[i].clean = true;
-         
+
          if (is_present) return true;
        }
   }
@@ -77,7 +83,17 @@ Player.prototype.position_is_adjacent = function(pos1, pos2){
 }
 
 
-p = new Player([4,4]);
+
 self.onmessage = function(event) {
-  p.add_letter(event.data);
+    var msg = event.data;
+    switch (msg.type){
+        case "init":
+            this.p = new Player(msg.size);
+            break;
+        case "add_letter":
+          this.p.add_letter(msg.letter);
+          break;
+    }
 };
+
+self.postMessage({type:"ready"});
