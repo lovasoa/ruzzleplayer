@@ -48,10 +48,10 @@ html {
 }
 </style>
 <script>
+var can_type = false;
+
 $(function (){
 var worker = new Worker('algoBin.js');
-
-var can_type = false;
 
 worker.onmessage = function(event) {
     var msg = event.data;
@@ -80,7 +80,7 @@ worker.onmessage = function(event) {
 };
 
 $("#hiddenInput").keypress(function (evt) {
-    if (evt.keyCode == 13) {
+    if (evt.keyCode === 13) {
         worker.postMessage({type:'init', size:[4,4]});
         can_type = true;
         $("#grid span").remove();
