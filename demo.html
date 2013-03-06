@@ -24,6 +24,15 @@
     border: 1px solid #111;
 }
 
+#hiddenInput {
+    position:fixed;
+    z-index:10;
+    margin:0;
+    width:100%;
+    height:100%;
+    opacity:0;
+}
+
 #solutions {
     width:50%;
     float:right;
@@ -37,13 +46,13 @@
 </style>
 <script>
 $(function (){
-var worker = new Worker('algo.js');
+var worker = new Worker('algoBin.js');
 
 var can_type = false;
 
 worker.onmessage = function(event) {
     var msg = event.data;
-    
+
     switch (msg.type) {
         case "word":
             $("<p>").text(msg.word).appendTo("#solutions");
@@ -61,21 +70,23 @@ worker.onmessage = function(event) {
         case "end":
             $("#message").text("Dictionary scanned in "+msg.time+"ms.").show();
             break;
+        case "log":
+            console.log(msg);
     }
 
 };
 
-$(document).keypress(function (evt) {
+$("#hiddenInput").keypress(function (evt) {
     if (evt.keyCode == 13) {
         worker.postMessage({type:'init', size:[4,4]});
         can_type = true;
-        $("#grid").html("");
+        $("#grid span").remove();
         $("#solutions").html("");
         $("#message").text("New grid!")
         return;
     }
     if (can_type) {
-        var letter = removeAccents(String.fromCharCode(evt.charCode));
+        var letter = removeAccents(String.fromCharCode(evt.charCode)).toUpperCase();
         worker.postMessage({type:'add_letter',letter:letter});
         $("<span>").text(letter).appendTo("#grid");
     }
@@ -107,7 +118,9 @@ function removeAccents (s){
 <div id="solutions">
 </div>
 
-<div id="grid"></div>
+<div id="grid">
+<textarea id="hiddenInput" autofocus></textarea>
+</div>
 
 <div id="instructions">
 Type letters to fill the grid.
