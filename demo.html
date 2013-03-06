@@ -66,7 +66,7 @@ worker.onmessage = function(event) {
 };
 
 $(document).keypress(function (evt) {
-    if (evt.charCode===13) {
+    if (evt.keyCode == 13) {
         worker.postMessage({type:'init', size:[4,4]});
         can_type = true;
         $("#grid").html("");
