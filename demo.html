@@ -31,8 +31,8 @@ html {
     position:fixed;
     z-index:10;
     margin:0;
-    width:100%;
-    height:100%;
+    width:400px;
+    height:400px;
     opacity:0;
 }
 
@@ -94,6 +94,8 @@ $("#hiddenInput").keypress(function (evt) {
         $("<span>").text(letter).appendTo("#grid");
     }
 });
+
+worker.postMessage({type:'init', size:[4,4]});
 });
 
 
