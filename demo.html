@@ -51,7 +51,10 @@ html {
 var can_type = false;
 
 $(function (){
-var worker = new Worker('algoBin.js');
+
+//Available worker files are:  "Cplayer/cplayerTree-Worker.js" and 'algoBin.js'
+var worker_file = "algoBin.js";
+var worker = new Worker(worker_file);
 
 worker.onmessage = function(event) {
     var msg = event.data;
@@ -69,15 +72,24 @@ worker.onmessage = function(event) {
             $("#message").text(msg.text);
             break;
         case "start":
+            $("#message").text("Searching words...").show();
             can_type = false;
+            break;
         case "end":
             $("#message").text("Dictionary scanned in "+msg.time+"ms.").show();
             break;
         case "log":
             console.log(msg);
+            break;
     }
 
 };
+
+worker.onerror = function (err) {
+    var msg = "Error in "+err.filename+":"+err.lineno+"\n"+err.message;
+    console.log(msg);
+    alert(msg);
+}
 
 $("#hiddenInput").keypress(function (evt) {
     if (evt.keyCode === 13) {
@@ -94,8 +106,6 @@ $("#hiddenInput").keypress(function (evt) {
         $("<span>").text(letter).appendTo("#grid");
     }
 });
-
-worker.postMessage({type:'init', size:[4,4]});
 });
 
 
