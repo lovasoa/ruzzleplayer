@@ -2,16 +2,20 @@
 #include <string.h>
 
 #define SIZE 4
-#define accessgrid(grid, i,j) grid[i+SIZE*j]
 
 #define capitalize(c)   (c&0xDF)
-#define is_char(c)      ( 'A'<=capitalize(c) && capitalize(c)<='Z')
+#define is_letter(c)      ( 'A'<=capitalize(c) && capitalize(c)<='Z')
+
+#define accessgrid(grid, i,j) grid[i+SIZE*j]
 
 #define MAX_STRLEN 50
-#define DEBUG 0
 
-char grid[SIZE*SIZE];
-FILE *dict;
+#ifndef DEBUG
+	#define DEBUG 0
+#endif
+
+static char grid[SIZE*SIZE];
+static FILE *dict;
 
 unsigned int endian_swap(unsigned int x)
 {
@@ -24,6 +28,13 @@ unsigned int endian_swap(unsigned int x)
 void reset_table(char *table, int length) {
     int i;
     for(i=0;i<length;i++)table[i]=0;
+}
+
+
+extern void found_word_callback(char *word);
+void found_word (char *word){
+    if(DEBUG>=2) printf("%s\n",word);
+    found_word_callback(word);
 }
 
 char word_is_present_recur(char *word,int word_length, int posx, int posy, char *path){
@@ -56,7 +67,6 @@ char word_is_present_recur(char *word,int word_length, int posx, int posy, char 
     return 0;
 }
 
-
 char word_is_present (char *word) {
     int x,y;
     int length = strlen(word);
@@ -77,10 +87,6 @@ char word_is_present (char *word) {
         }
     }
     return 0;
-}
-
-void found_word (char *word){
-    printf("%s\n",word);
 }
 
 int read_entry(int pos, char work_str[], unsigned int work_str_length) {
@@ -145,18 +151,6 @@ void find_words () {
     read_entry(0, strbuf, 0);
 }
 
-void dump_grid() {
-	int i=0,j;
-	for(j=0;j<SIZE;j++){printf("___");}printf("\n");
-	while(i<SIZE*SIZE){
-		if (is_char(grid[i])) printf("| %c", grid[i]);
-		else printf("| %d", grid[i]);
-		if (++i%SIZE == 0) printf("|\n");
-	}
-	for(j=0;j<SIZE;j++){printf("___");}printf("\n");
-	printf("\n");
-}
-
 int init_grid(char *letters) {
     int i = 0;
     if (strlen(letters) < SIZE*SIZE){
@@ -166,7 +160,7 @@ int init_grid(char *letters) {
     }
 
     while (letters[i] != '\0' && i<SIZE*SIZE){
-        if(is_char(letters[i])){
+        if(is_letter(letters[i])){
             grid[i] = capitalize(letters[i]);
             i++;
         }

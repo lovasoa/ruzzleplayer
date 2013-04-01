@@ -1,4 +1,4 @@
-var dictfile = '../BinaryDict.bin';
+var dictfile = 'assets/dict.bin';
 
 importScripts("libcplayerTree-compiled.js");
 

@@ -53,7 +53,7 @@ var can_type = false;
 $(function (){
 
 //Available worker files are:  "Cplayer/cplayerTree-Worker.js" and 'algoBin.js'
-var worker_file = "algoBin.js";
+var worker_file = "Cplayer/cplayerTree-Worker.js";
 var worker = new Worker(worker_file);
 
 worker.onmessage = function(event) {
@@ -81,6 +81,9 @@ worker.onmessage = function(event) {
         case "log":
             console.log(msg);
             break;
+        default:
+        	console.log("Received abnormal message:", msg);
+        	break;
     }
 
 };
